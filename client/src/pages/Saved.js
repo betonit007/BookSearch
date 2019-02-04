@@ -9,14 +9,6 @@ import {Animated} from "react-animated-css";
 
 var socket = io.connect();
 
-const styles = {
-  saveAlert: {
-    position: "relative",
-    bottom: "50px",
-    visibility: "hidden",
-    color: "red"
-  }
-};
 
 class Saved extends Component {
   state = {
