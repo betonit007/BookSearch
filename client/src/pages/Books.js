@@ -1,17 +1,35 @@
 import React, { Component } from "react";
 import Jumbotron from "../components/Jumbotron";
 import API from "../utils/API";
-import { Link } from "react-router-dom";
 import { Col, Row, Container } from "../components/Grid";
 import { BookList, BookListItem } from "../components/Booklist";
 import { Input, FormBtn } from "../components/Form";
+import io from 'socket.io-client';
+import {Animated} from "react-animated-css";
+
+
+var socket = io.connect();
+
+
 
 class Books extends Component {
   state = {
     books: [],
-    description: ""
+    description: "",
+    savedBook: "",
+    animate: false
   };
 
+
+  /////listener for socket event from server (when a user saves a book)
+  componentWillMount() {
+    socket.on("savedBook", (data) => {
+      this.setState({ savedBook : "📖 Saved By Reader: " + data + " 📖", animate: true });
+      setTimeout(() => { this.setState({ animate: false });
+        
+      }, 3000);
+    })
+  }
   searchGoogle = (query) => {
     API.search(query).then(res => this.setState({ books: res.data.items, description: "" }))
     .then(()=>console.log(this.state.books)).catch(err => console.log(err));
@@ -54,8 +72,12 @@ class Books extends Component {
       image: saveIt[0].volumeInfo.imageLinks.thumbnail,
       link: saveIt[0].volumeInfo.previewLink
     };
-
+    
     API.saveBook(sendIt).then(res => this.handleDelete(id))
+    .then(console.log(sendIt.title))
+    .then(socket.emit('savedBook', {
+      book: sendIt.title
+    }))
     .catch(err => console.log(err));
   }
 
@@ -67,12 +89,19 @@ class Books extends Component {
   };
 
   render() {
+
+    
     return (
       <Container fluid>
         <Row>
           <Col size="md-12">
             <Jumbotron>
               <img src="https://www.knowerstech.com/wp-content/uploads/2017/01/google-book.png"></img>
+              <Animated style={{zIndex: 5, position:"fixed", top: "50%", left: "50%"}} animationIn="bounceInDown" animationOut="bounceOutDown" isVisible={this.state.animate}>
+                    <div style={{backgroundColor: "#FF0000", color: "white", fontSize: "25px"}}>
+                       {this.state.savedBook}
+                    </div>
+                </Animated>
             </Jumbotron>
             <form>
               <Input

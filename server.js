@@ -4,6 +4,8 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 const routes = require("./routes");
 const mongoose = require("mongoose");
+const socket = require("socket.io");
+
 
 // Define middleware here
 app.use(express.urlencoded({ extended: true }));
@@ -24,6 +26,17 @@ app.get("*", (req, res) => {
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/googlebooks");
 
-app.listen(PORT, () => {
+var server = app.listen(PORT, () => {
   console.log(`🌎 ==> API server now on port ${PORT}!`);
 });
+
+var io = socket(server);
+
+io.on('connection', function(socket) {
+  console.log("made socket connection", socket.id);
+
+  socket.on("savedBook", function(data) {
+    io.sockets.emit("savedBook", data.book);
+  })
+  
+})

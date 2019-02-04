@@ -5,6 +5,16 @@ import { Link } from "react-router-dom";
 import { Col, Row, Container } from "../components/Grid";
 import { SaveList, SaveListItem } from "../components/Savelist";
 
+
+const styles = {
+  saveAlert: {
+    position: "relative",
+    bottom: "50px",
+    visibility: "hidden",
+    color: "red"
+  }
+};
+
 class Saved extends Component {
   state = {
     books: []
@@ -35,6 +45,7 @@ class Saved extends Component {
           <Col size="md-12">
           <Jumbotron>
               <img src="https://www.knowerstech.com/wp-content/uploads/2017/01/google-book.png"></img>
+              <div style={styles.saveAlert}>Book Saved!</div>
             </Jumbotron>
           </Col>
           <Col size="md-12 sm-12">
