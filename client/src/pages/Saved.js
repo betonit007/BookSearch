@@ -4,7 +4,10 @@ import API from "../utils/API";
 import { Link } from "react-router-dom";
 import { Col, Row, Container } from "../components/Grid";
 import { SaveList, SaveListItem } from "../components/Savelist";
+import io from 'socket.io-client';
+import {Animated} from "react-animated-css";
 
+var socket = io.connect();
 
 const styles = {
   saveAlert: {
@@ -22,6 +25,12 @@ class Saved extends Component {
 
   componentDidMount() {
     this.loadBooks();
+    socket.on("savedBook", (data) => {
+      this.setState({ savedBook : "📖 Saved By Reader: " + data + " 📖", animate: true });
+      setTimeout(() => { this.setState({ animate: false });
+        
+      }, 3000);
+    })
   }
 
   loadBooks = () => {
@@ -44,8 +53,12 @@ class Saved extends Component {
         <Row>
           <Col size="md-12">
           <Jumbotron>
-              <img src="https://www.knowerstech.com/wp-content/uploads/2017/01/google-book.png"></img>
-              <div style={styles.saveAlert}>Book Saved!</div>
+          <img src="https://www.knowerstech.com/wp-content/uploads/2017/01/google-book.png"></img>
+          <Animated style={{zIndex: 5, position:"fixed", top: "50%", left: "50%"}} animationIn="bounceInDown" animationOut="bounceOutDown" isVisible={this.state.animate}>
+                    <div style={{backgroundColor: "#FF0000", color: "white", fontSize: "25px"}}>
+                       {this.state.savedBook}
+                    </div>
+                </Animated>
             </Jumbotron>
           </Col>
           <Col size="md-12 sm-12">
